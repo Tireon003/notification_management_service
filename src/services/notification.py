@@ -2,6 +2,7 @@ import logging
 from uuid import UUID
 from datetime import datetime as dt
 
+from src.config import Settings
 from src.exceptions import NotificationAlreadyReadError
 from src.repositories import NotificationRepository
 from src.schemas import (
@@ -10,8 +11,10 @@ from src.schemas import (
     NotificationCreate,
     NotificationUpdate,
 )
+from src.tasks import process_text
 
 logger = logging.getLogger(__name__)
+settings = Settings()
 
 
 class NotificationService:
@@ -44,6 +47,10 @@ class NotificationService:
         new_notification = await self._repository.create(notification_data)
         new_notification_dto = NotificationRead.model_validate(
             new_notification
+        )
+        process_text.apply_async(
+            args=(str(new_notification_dto.id), new_notification_dto.text),
+            task_id=str(new_notification_dto.id),
         )
         return new_notification_dto
 

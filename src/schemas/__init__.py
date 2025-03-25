@@ -4,6 +4,7 @@ from .notification import (
     NotificationUpdate,
 )
 from .paginator import Paginator
+from .tasks import AnalyzeTextTaskResult
 
 
 __all__ = (
@@ -11,4 +12,5 @@ __all__ = (
     "NotificationRead",
     "NotificationUpdate",
     "Paginator",
+    "AnalyzeTextTaskResult",
 )

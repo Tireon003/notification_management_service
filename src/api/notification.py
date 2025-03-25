@@ -10,6 +10,7 @@ from fastapi import (
     Path,
     HTTPException,
 )
+from fastapi.responses import JSONResponse
 from sqlalchemy.exc import NoResultFound
 
 from src.dependencies import notification_service
@@ -116,6 +117,36 @@ async def set_notification_read(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{exc}",
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error while getting notification: {exc}. Please, contact with dev and provide this detail.",
+        )
+
+
+@router.get(
+    path="/{notification_id}/processing_status",
+    status_code=status.HTTP_200_OK,
+    description="Get current notification analyze status",
+)
+async def get_notification_processing_status(
+    notification_id: Annotated[UUID, Path()],
+    service: Annotated[
+        NotificationService,
+        Depends(notification_service),
+    ],
+) -> JSONResponse:
+    try:
+        notification = await service.get_notification(notification_id)
+        return JSONResponse(
+            content=dict(status=notification.processing_status),
+            status_code=status.HTTP_200_OK,
+        )
+    except NoResultFound:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Notification not found",
         )
     except Exception as exc:
         raise HTTPException(

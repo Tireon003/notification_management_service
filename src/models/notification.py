@@ -1,7 +1,7 @@
-from uuid import UUID, uuid4
+from uuid import UUID
 from datetime import datetime as dt
 
-from sqlalchemy import String
+from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core import Base
@@ -11,7 +11,10 @@ from src.enums import ProcessingStatusEnum, CategoryEnum
 class Notification(Base):
     __tablename__ = "notifications"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4())
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=text("gen_random_uuid()"),
+    )
     user_id: Mapped[UUID] = mapped_column(nullable=False)
     title = mapped_column(String(256), nullable=False)
     text: Mapped[str] = mapped_column(String(512), nullable=False)
