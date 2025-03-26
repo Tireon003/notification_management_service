@@ -1,6 +1,6 @@
 import logging
 
-from collections.abc import AsyncIterator, AsyncGenerator
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Literal, Any
 
@@ -37,12 +37,8 @@ class Database:
 
     @asynccontextmanager
     async def create_async_session(self) -> AsyncIterator[AsyncSession]:
-        async with self._session_maker() as session:
-            yield session
-
-    async def get_async_session(self) -> AsyncGenerator[AsyncSession, None]:
         try:
-            async with self.create_async_session() as session:
+            async with self._session_maker() as session:
                 yield session
         except Exception as err:
             logger.error(
@@ -55,7 +51,3 @@ class Database:
 
 class Base(DeclarativeBase):
     pass
-
-
-def get_database(settings: Settings) -> Database:
-    return Database(settings=settings)

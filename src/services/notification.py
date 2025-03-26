@@ -2,7 +2,6 @@ import logging
 from uuid import UUID
 from datetime import datetime as dt
 
-from src.config import Settings
 from src.exceptions import NotificationAlreadyReadError
 from src.repositories import NotificationRepository
 from src.schemas import (
@@ -14,7 +13,6 @@ from src.schemas import (
 from src.tasks import process_text
 
 logger = logging.getLogger(__name__)
-settings = Settings()
 
 
 class NotificationService:

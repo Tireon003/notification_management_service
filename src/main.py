@@ -14,7 +14,7 @@ from fastapi import FastAPI
 root_path = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(root_path))
 
-from src.config import Settings
+from src.config import Settings, get_settings
 from src.api import gateway_router
 
 
@@ -47,7 +47,7 @@ def create_app(settings: Settings) -> FastAPI:
 
 
 def main() -> None:
-    settings = Settings()
+    settings = get_settings()
     configure_logging(settings)
     app = create_app(settings)
     uvicorn.run(

@@ -1,7 +1,7 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from datetime import datetime as dt
 
-from sqlalchemy import String, text
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core import Base
@@ -13,7 +13,7 @@ class Notification(Base):
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=text("gen_random_uuid()"),
+        default=uuid4(),
     )
     user_id: Mapped[UUID] = mapped_column(nullable=False)
     title = mapped_column(String(256), nullable=False)

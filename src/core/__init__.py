@@ -1,8 +1,7 @@
-from .database import Base, Database, get_database
+from .database import Base, Database
 
 
 __all__ = (
     "Base",
     "Database",
-    "get_database",
 )
