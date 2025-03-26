@@ -11,12 +11,14 @@ from fastapi import (
     HTTPException,
 )
 from fastapi.responses import JSONResponse
+from fastapi_cache.decorator import cache
 from sqlalchemy.exc import NoResultFound
 
 from src.dependencies import notification_service
 from src.exceptions import NotificationAlreadyReadError
 from src.schemas import NotificationCreate, NotificationRead, Paginator
 from src.services import NotificationService
+from src.utils import key_builder_by_url_method
 
 router = APIRouter(
     prefix="/notification",
@@ -69,6 +71,7 @@ async def get_notifications(
     description="Get detailed info about concrete notification",
     status_code=status.HTTP_200_OK,
 )
+@cache(expire=20, key_builder=key_builder_by_url_method)
 async def get_notification(
     notification_id: Annotated[UUID, Path()],
     service: Annotated[
@@ -130,6 +133,7 @@ async def set_notification_read(
     status_code=status.HTTP_200_OK,
     description="Get current notification analyze status",
 )
+@cache(expire=5, key_builder=key_builder_by_url_method)
 async def get_notification_processing_status(
     notification_id: Annotated[UUID, Path()],
     service: Annotated[

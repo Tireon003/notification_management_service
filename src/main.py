@@ -1,6 +1,12 @@
 import logging
 import pathlib
 import sys
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
 
 import uvicorn
 from fastapi import FastAPI
@@ -20,6 +26,12 @@ def configure_logging(settings: Settings) -> None:
 
 
 def create_app(settings: Settings) -> FastAPI:
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        redis = aioredis.from_url(url=settings.redis_url)  # type: ignore[no-untyped-call]
+        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+        yield
+
     app = FastAPI(
         title="Notifications service API",
         description="This service provides notifications API",
@@ -27,6 +39,7 @@ def create_app(settings: Settings) -> FastAPI:
         redoc_url=None,
         docs_url="/api/docs",
         debug=True,
+        lifespan=lifespan,
     )
     app.include_router(gateway_router)
 
