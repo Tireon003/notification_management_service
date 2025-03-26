@@ -11,6 +11,8 @@ from redis import asyncio as aioredis
 import uvicorn
 from fastapi import FastAPI
 
+from src.limiter import init_limiter
+
 root_path = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(root_path))
 
@@ -50,6 +52,7 @@ def main() -> None:
     settings = get_settings()
     configure_logging(settings)
     app = create_app(settings)
+    init_limiter(app)
     uvicorn.run(
         app=app,
         host=settings.APP_HOST,

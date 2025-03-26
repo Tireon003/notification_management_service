@@ -10,6 +10,7 @@ from fastapi import (
     Path,
     HTTPException,
 )
+from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi_cache.decorator import cache
 from sqlalchemy.exc import NoResultFound
@@ -19,6 +20,7 @@ from src.exceptions import NotificationAlreadyReadError
 from src.schemas import NotificationCreate, NotificationRead, Paginator
 from src.services import NotificationService
 from src.utils import key_builder_by_url_method
+from src.limiter import limiter
 
 router = APIRouter(
     prefix="/notification",
@@ -31,7 +33,9 @@ router = APIRouter(
     description="Add a notification",
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("2/second")
 async def create_notification(
+    request: Request,
     notification_data: Annotated[
         NotificationCreate,
         Body(),
@@ -52,7 +56,9 @@ async def create_notification(
     description="Get all notifications",
     status_code=status.HTTP_200_OK,
 )
+@limiter.limit("6/minute")
 async def get_notifications(
+    request: Request,
     paginator: Annotated[
         Paginator,
         Query(),
@@ -71,8 +77,10 @@ async def get_notifications(
     description="Get detailed info about concrete notification",
     status_code=status.HTTP_200_OK,
 )
+@limiter.limit("1/second")
 @cache(expire=20, key_builder=key_builder_by_url_method)
 async def get_notification(
+    request: Request,
     notification_id: Annotated[UUID, Path()],
     service: Annotated[
         NotificationService,
@@ -133,8 +141,10 @@ async def set_notification_read(
     status_code=status.HTTP_200_OK,
     description="Get current notification analyze status",
 )
+@limiter.limit("1/second")
 @cache(expire=5, key_builder=key_builder_by_url_method)
 async def get_notification_processing_status(
+    request: Request,
     notification_id: Annotated[UUID, Path()],
     service: Annotated[
         NotificationService,
