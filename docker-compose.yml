@@ -53,7 +53,7 @@ services:
     depends_on:
       - redis
       - database
-    command: python3 src/main.py
+    command: bash -c "alembic upgrade head & python3 api_server/main.py"
 
   celery:
     build:
