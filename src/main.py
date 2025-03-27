@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import sys
 from collections.abc import AsyncIterator
@@ -11,6 +12,7 @@ from redis import asyncio as aioredis
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from src.limiter import init_limiter
 
@@ -44,9 +46,16 @@ def create_app(settings: Settings) -> FastAPI:
         debug=True,
         lifespan=lifespan,
     )
+    mount_views(app)
     app.include_router(gateway_router)
 
     return app
+
+
+def mount_views(app: FastAPI) -> None:
+    script_dir = os.path.dirname(__file__)
+    static_dir = os.path.join(script_dir, "static")
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 def add_cors_middleware(app: FastAPI) -> None:
