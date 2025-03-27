@@ -1,5 +1,6 @@
 from typing import AsyncGenerator
 from uuid import uuid4
+from datetime import datetime as dt
 import pytest
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from httpx import AsyncClient, ASGITransport
@@ -71,7 +72,11 @@ async def test_notification(database: Database) -> NotificationRead:
             text="This is a test message",
             user_id=uuid4(),
         )
-        notification = Notification(**notification_data.model_dump())
+        notification = Notification(
+            id=uuid4(),
+            created_at=dt.now(),
+            **notification_data.model_dump(),
+        )
         session.add(notification)
         await session.commit()
         await session.refresh(notification)
