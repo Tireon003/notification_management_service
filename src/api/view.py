@@ -13,7 +13,9 @@ templates = Jinja2Templates(directory=templates_dir)
 
 
 @router.get("/", response_class=HTMLResponse)
-async def get_notifications_page(request: Request):
+async def get_notifications_page(
+    request: Request,
+) -> HTMLResponse:
     return templates.TemplateResponse(
         "notifications.html", {"request": request}
     )
