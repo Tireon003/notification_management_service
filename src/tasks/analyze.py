@@ -1,6 +1,5 @@
 import asyncio
 import random
-from typing import Any
 
 from celery import Celery
 from celery.app.task import Task
