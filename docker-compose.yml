@@ -50,6 +50,21 @@ services:
       - .env
     restart: unless-stopped
     container_name: app
+    depends_on:
+      - redis
+      - database
+    command: python3 src/main.py
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./src/Dockerfile
+    restart: unless-stopped
+    container_name: celery
+    depends_on:
+      - redis
+      - database
+    command: celery -A src.tasks.analyze:celery worker --loglevel=INFO
 
 
 volumes:
