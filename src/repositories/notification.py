@@ -1,3 +1,5 @@
+import uuid
+from datetime import datetime as dt, timedelta as td
 from uuid import UUID
 
 from sqlalchemy import select
@@ -27,7 +29,12 @@ class NotificationRepository:
         return obj_list
 
     async def create(self, obj: NotificationCreate) -> Notification:
-        new_obj = Notification(**obj.model_dump())
+        odb_uuid = uuid.uuid4()
+        new_obj = Notification(
+            id=odb_uuid,
+            created_at=dt.now(),
+            **obj.model_dump(),
+        )
         self._session.add(new_obj)
         await self._session.flush()
         await self._session.refresh(new_obj)

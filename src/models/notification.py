@@ -11,14 +11,11 @@ from src.enums import ProcessingStatusEnum, CategoryEnum
 class Notification(Base):
     __tablename__ = "notifications"
 
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        default=uuid4(),
-    )
+    id: Mapped[UUID] = mapped_column(primary_key=True)
     user_id: Mapped[UUID] = mapped_column(nullable=False)
     title = mapped_column(String(256), nullable=False)
     text: Mapped[str] = mapped_column(String(512), nullable=False)
-    created_at: Mapped[dt] = mapped_column(default=dt.now())
+    created_at: Mapped[dt]
     read_at: Mapped[dt | None] = mapped_column(nullable=True, default=None)
     category: Mapped[CategoryEnum | None] = mapped_column(
         nullable=True,
