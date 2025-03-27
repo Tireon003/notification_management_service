@@ -3,13 +3,14 @@ import pathlib
 import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-
+from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 
 import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from src.limiter import init_limiter
 
@@ -48,11 +49,23 @@ def create_app(settings: Settings) -> FastAPI:
     return app
 
 
+def add_cors_middleware(app: FastAPI) -> None:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
 def main() -> None:
     settings = get_settings()
     configure_logging(settings)
     app = create_app(settings)
     init_limiter(app)
+    Instrumentator().instrument(app).expose(app)
+    add_cors_middleware(app)
     uvicorn.run(
         app=app,
         host=settings.APP_HOST,

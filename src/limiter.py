@@ -3,10 +3,13 @@ from slowapi import Limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
+from src.config import get_settings
+
+settings = get_settings()
 
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri="redis://localhost:6379",
+    storage_uri=settings.redis_url,
 )
 
 
