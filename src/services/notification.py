@@ -72,3 +72,14 @@ class NotificationService:
             updated_notification_orm
         )
         return updated_notification_dto
+
+    async def get_recent_notifications(self) -> list[NotificationRead]:
+        current_dt = dt.now()
+        notifications_orm_list = await self._repository.get_all_from_dt(
+            current_dt
+        )
+        notifications_dto = [
+            NotificationRead.model_validate(item)
+            for item in notifications_orm_list
+        ]
+        return notifications_dto

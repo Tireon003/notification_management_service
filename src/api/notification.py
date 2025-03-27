@@ -167,3 +167,22 @@ async def get_notification_processing_status(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error while getting notification: {exc}. Please, contact with dev and provide this detail.",
         )
+
+
+@router.websocket(path="/stream")
+async def get_notifications_realtime(
+    websocket: WebSocket,
+    service: Annotated[
+        NotificationService,
+        Depends(notification_service),
+    ],
+) -> None:
+    await websocket.accept()
+    while True:
+        await asyncio.sleep(1)
+        try:
+            recent_notifications = await service.get_recent_notifications()
+            notifications_data = jsonable_encoder(recent_notifications)
+            await websocket.send_json(notifications_data)
+        except WebSocketDisconnect:
+            return

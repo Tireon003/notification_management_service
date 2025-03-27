@@ -58,3 +58,15 @@ class NotificationRepository:
 
         await self._session.commit()
         return obj
+
+    async def get_all_from_dt(self, start_dt: dt) -> list[Notification]:
+        time_window = td(seconds=1)
+
+        stmt = (
+            select(Notification)
+            .where(Notification.created_at >= start_dt - time_window)
+            .order_by(Notification.created_at.desc())
+        )
+        result = await self._session.scalars(stmt)
+        obj_list = [obj for obj in result.all()]
+        return obj_list
