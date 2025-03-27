@@ -13,7 +13,7 @@
       "targets": [
         {
           "expr": "rate(http_request_duration_seconds_count[5m])",
-          "legendFormat": "{{method}} {{route}}",
+          "legendFormat": "{{method}} {{handler}}",
           "refId": "A"
         }
       ],
